@@ -1,4 +1,133 @@
-startsWith('+7')) phoneInput.value='+7 ';
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Запись на осмотр — ДТП 🚗</title>
+<style>
+:root{
+  --bg: linear-gradient(180deg,#f7f7fb 0%,#eef2fb 100%);
+  --card: rgba(255,255,255,0.85);
+  --muted: #6b7280;
+  --accent: #0a84ff;
+  --accent-dark: #0066d6;
+  --radius: 22px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+}
+html,body{height:100%;margin:0;}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+
+.frame{
+  width:100%;
+  max-width:420px;
+  border-radius:28px;
+  backdrop-filter:blur(12px) saturate(120%);
+  background: var(--card);
+  padding:20px;
+  box-shadow:0 10px 30px rgba(20,20,50,0.12);
+}
+
+header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#fff,#f9fbff);border:1px solid rgba(0,0,0,0.04);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 6px 16px rgba(10,20,50,0.06),inset 0 -6px 20px rgba(255,255,255,0.6);}
+h1{font-size:20px;margin:0;color:#0b1220;line-height:1.1;}
+
+form{margin-top:10px;}
+.group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+label{font-size:13px;color:var(--muted);}
+input{
+  -webkit-appearance:none;
+  appearance:none;
+  border:none;
+  outline:none;
+  background: rgba(255,255,255,0.95);
+  border-radius:18px;
+  padding:14px 16px;
+  font-size:16px;
+  box-shadow:0 6px 16px rgba(10,20,50,0.05);
+  transition: all 0.25s ease;
+}
+input:focus{box-shadow:0 0 0 3px rgba(10,132,255,0.2);background: rgba(255,255,255,0.98);}
+input::placeholder{color:#b8bcc3;}
+
+.actions{display:flex;flex-direction:column;gap:12px;margin-top:18px;}
+button.primary{
+  background:linear-gradient(180deg,var(--accent),var(--accent-dark));
+  color:white;
+  border:none;
+  padding:16px;
+  font-size:17px;
+  border-radius:20px;
+  cursor:pointer;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow:0 8px 24px rgba(10,132,255,0.18);
+}
+button.primary:active{
+  transform: scale(0.97);
+  box-shadow:0 4px 12px rgba(10,132,255,0.15);
+}
+
+.status{margin-top:14px;padding:10px;border-radius:14px;font-size:14px;display:none;opacity:0;transition: opacity 0.3s ease;}
+.status.show{display:block;opacity:1;}
+.ok{background:rgba(16,185,129,0.08); color:#065f46; border:1px solid rgba(16,185,129,0.12);}
+.err{background:rgba(239,68,68,0.06); color:#7f1d1d; border:1px solid rgba(239,68,68,0.08);}
+</style>
+</head>
+<body>
+<div class="frame">
+  <header>
+    <div class="logo">🚗</div>
+    <h1>Запись на осмотр после ДТП</h1>
+  </header>
+
+  <form id="apptForm" autocomplete="off">
+    <div class="group">
+      <label>Имя клиента</label>
+      <input id="name" type="text" placeholder="Иван Иванов 👋" required>
+    </div>
+    <div class="group">
+      <label>Номер телефона</label>
+      <input id="phone" type="tel" value="+7 " maxlength="16" placeholder="+7 XXX XXX XX XX 📱" required>
+    </div>
+    <div class="group">
+      <label>Марка авто</label>
+      <input id="make" type="text" placeholder="Toyota, Lada, BMW 🚘" required>
+    </div>
+    <div class="group">
+      <label>Гос. номер</label>
+      <input id="plate" type="text" placeholder="A777AA77 🪪" required>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="primary">📩 Отправить запись</button>
+    </div>
+    <div id="status" class="status"></div>
+  </form>
+</div>
+
+<script>
+const form=document.getElementById('apptForm');
+const statusEl=document.getElementById('status');
+const phoneInput=document.getElementById('phone');
+
+const TELEGRAM_TOKEN="7540783502:AAGaCzOo4G951ECpFBeUED5_Mhk0qFdlkFI";
+const TELEGRAM_CHAT_ID="881133631";
+const OFFICE_ADDRESS="г. Воронеж, Антонова-Овсиенко, 15А корпус 1";
+const OFFICE_PHONE="+7 (908) 134-37-22";
+
+// Маска телефона
+phoneInput.addEventListener('input',()=>{
+  if(!phoneInput.value.startsWith('+7')) phoneInput.value='+7 ';
   let digits=phoneInput.value.replace(/\D/g,'').slice(1,11);
   let formatted='+7 ';
   if(digits.length>0) formatted+=digits.substring(0,3);
