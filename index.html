@@ -1,207 +1,44 @@
-<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Городская Служба ДТП | Воронеж</title>
-<style>
-  :root {
-    --bg: #f5f7fa;
-    --card: #ffffff;
-    --accent: #00c46a;
-    --text: #222;
-    --muted: #666;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Arial;
-    background: var(--bg);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-  }
-  header {
-    padding: 20px;
-    text-align: center;
-    background: var(--accent);
-    color: white;
-    font-weight: 600;
-    font-size: 18px;
-    letter-spacing: 0.5px;
-  }
-  main {
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-  }
-  .card {
-    background: var(--card);
-    width: 100%;
-    max-width: 420px;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    animation: fadeUp 0.6s ease;
-  }
-  h2 {
-    margin-top: 0;
-    font-size: 20px;
-    text-align: center;
-  }
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  label {
-    font-size: 14px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    display: block;
-  }
-  input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    font-size: 16px;
-    transition: border 0.2s, box-shadow 0.2s;
-  }
-  input:focus {
-    border: 1px solid var(--accent);
-    box-shadow: 0 0 0 3px rgba(0,196,106,0.2);
-    outline: none;
-  }
-  .address {
-    font-size: 14px;
-    color: var(--muted);
-    padding: 12px;
-    background: #fafafa;
-    border-radius: 12px;
-    border: 1px dashed #ddd;
-  }
-  button {
-    padding: 16px;
-    border-radius: 14px;
-    border: none;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: white;
-    box-shadow: 0 6px 20px rgba(0,196,106,0.3);
-  }
-  .btn-primary:active {
-    transform: scale(0.98);
-  }
-  .btn-secondary {
-    background: #f0f0f0;
-    color: var(--muted);
-  }
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #222;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 12px;
-    display: none;
-    font-size: 14px;
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: none; }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-</style>
-</head>
-<body>
-  <header>Городская Служба ДТП | Воронеж</header>
-  <main>
-    <div class="card">
-      <h2>Запись на осмотр</h2>
-      <form id="clientForm">
-        <div>
-          <label for="fio">ФИО</label>
-          <input id="fio" type="text" placeholder="Иванов Иван Иванович" required>
-        </div>
-        <div>
-          <label for="phone">Телефон</label>
-          <input id="phone" type="tel" placeholder="+7 900 000 00 00" required>
-        </div>
-        <div>
-          <label for="mark">Марка машины</label>
-          <input id="mark" type="text" placeholder="Lada Vesta" required>
-        </div>
-        <div>
-          <label for="plate">Гос. номер</label>
-          <input id="plate" type="text" placeholder="А000ВС36" required>
-        </div>
-        <div class="address">
-          Место осмотра: г. Воронеж, ул. Антонова-Овсиенко, 15А корпус 1
-        </div>
-        <button class="btn-primary" type="submit">Записать и открыть WhatsApp</button>
-        <button class="btn-secondary" type="button" id="clearBtn">Очистить</button>
-      </form>
-    </div>
-  </main>
-  <div class="toast" id="toast"></div>
-
-<script>
-const TELEGRAM_BOT_TOKEN = "7540783502:AAGaCzOo4G951ECpFBeUED5_Mhk0qFdlkFI";
-const TELEGRAM_CHAT_ID   = "881133631";
-const STATIC_ADDRESS = "г. Воронеж, ул. Антонова-Овсиенко, 15А корпус 1";
-
-function toast(msg, time=3000){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(()=> t.style.display='none', time);
-}
-
-document.getElementById('clientForm').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const fio = document.getElementById('fio').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const mark = document.getElementById('mark').value.trim();
-  const plate = document.getElementById('plate').value.trim();
-
-  const whatsappText =
-    `Здравствуйте, ${fio}!\nВы записаны на осмотр после ДТП.\n\nМесто: ${STATIC_ADDRESS}\nМарка: ${mark}\nГос. номер: ${plate}`;
-
-  const waUrl = 'https://wa.me/' + phone.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(whatsappText);
-  window.open(waUrl, '_blank');
-
-  const tgMessage =
-    `Новая запись на осмотр:\n${fio}\nТелефон: ${phone}\nМарка: ${mark}\nГосномер: ${plate}\nМесто: ${STATIC_ADDRESS}\nВремя: ${new Date().toLocaleString()}`;
-
-  try {
-    const resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json'},
-      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: tgMessage })
-    });
-    if (resp.ok) toast("Уведомление отправлено в Telegram ✅");
-    else toast("Не удалось отправить в Telegram");
-  } catch {
-    toast("Ошибка отправки в Telegram");
-  }
+startsWith('+7')) phoneInput.value='+7 ';
+  let digits=phoneInput.value.replace(/\D/g,'').slice(1,11);
+  let formatted='+7 ';
+  if(digits.length>0) formatted+=digits.substring(0,3);
+  if(digits.length>=4) formatted+=' '+digits.substring(3,6);
+  if(digits.length>=7) formatted+=' '+digits.substring(6,8);
+  if(digits.length>=9) formatted+=' '+digits.substring(8,10);
+  phoneInput.value=formatted;
 });
 
-document.getElementById('clearBtn').addEventListener('click', ()=>{
-  document.getElementById('fio').value='';
-  document.getElementById('phone').value='';
-  document.getElementById('mark').value='';
-  document.getElementById('plate').value='';
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  statusEl.className='status';
+  const name=document.getElementById('name').value.trim();
+  const make=document.getElementById('make').value.trim();
+  const plate=document.getElementById('plate').value.trim();
+  const phoneDigits=phoneInput.value.replace(/\D/g,''); // цифры для WhatsApp
+
+  if(phoneDigits.length!==11 || !phoneDigits.startsWith('7')){
+    statusEl.textContent='⚠️ Введите корректный номер +7 XXX XXX XX XX';
+    statusEl.className='status show err';
+    return;
+  }
+
+  // WhatsApp сообщение клиенту
+  const waMessage=`Здравствуйте, ${name}!\nВы записаны на осмотр.\n📍 Адрес: ${OFFICE_ADDRESS}\n🚗 Авто: ${make}, ${plate}\n📞 Телефон для связи: ${OFFICE_PHONE}\nС вами свяжутся по телефону для подтверждения времени записи.\nСпасибо за обращение!`;
+  const waUrl=`https://wa.me/${phoneDigits}?text=${encodeURIComponent(waMessage)}`;
+  window.open(waUrl,'_blank');
+
+  // Telegram запись для вас с номером клиента
+  const tgText=`🚨 Новая запись на осмотр 🚨\n\n👤 Имя: ${name}\n📞 Телефон клиента: +${phoneDigits}\n🚗 Марка авто: ${make}\n🪪 Гос. номер: ${plate}\n📍 Адрес: ${OFFICE_ADDRESS}`;
+  const tgUrl=`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${encodeURIComponent(TELEGRAM_CHAT_ID)}&parse_mode=HTML&text=${encodeURIComponent(tgText)}`;
+
+  try{
+    await fetch(tgUrl,{method:'GET',mode:'cors'});
+    statusEl.textContent='✅ Запись отправлена в Telegram и открыт WhatsApp';
+    statusEl.className='status show ok';
+  }catch{
+    statusEl.textContent='⚠️ WhatsApp открыт. Не удалось отправить в Telegram';
+    statusEl.className='status show err';
+  }
 });
 </script>
 </body>
